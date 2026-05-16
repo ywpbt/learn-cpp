@@ -26,3 +26,7 @@ release	Configure/Build	Release 构建（优化）
 cmake --preset list          # 列出所有可用 presets
 cmake --preset <name>        # 使用指定 preset 配置
 cmake --build --preset <name>  # 使用指定 preset 编译
+
+
+
+如果想使用 glob 可以在 CMake 3.12+ 使用 CONFIGURE_DEPENDS: file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "*.cc")

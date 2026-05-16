@@ -1,3 +1,4 @@
 {
     "editor.suggestSelection": "recentlyUsedByPrefix",
+    // "C_Cpp.default.compilerPath": "C:/usr-bin/msys64/ucrt64/bin/g++.exe",
 }
