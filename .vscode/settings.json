@@ -1,4 +1,11 @@
 {
-    "editor.suggestSelection": "recentlyUsedByPrefix",
-    // "C_Cpp.default.compilerPath": "C:/usr-bin/msys64/ucrt64/bin/g++.exe",
+    "chat.utilityModel": "customendpoint/deepseek-v4-flash",
+    "chat.utilitySmallModel": "customendpoint/deepseek-v4-flash",
+    "chat.tools.terminal.autoApprove": {
+        "ctest": true,
+        "/^cd /home/ywp/learn-cpp && git add -A && git commit -m \"feat: 集成测试框架 doctest，添加 CMake presets 和 run target\n\n- 添加 doctest 子模块到 third_party\n- 新增 add 函数和 read_lines_from_file 的单元测试\n- 添加 cmake --build --target run 快捷运行\n- 添加 CMakePresets\\.json 预设配置\n- 启用 CMAKE_EXPORT_COMPILE_COMMANDS 供 IDE 使用\" 2>&1$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
 }

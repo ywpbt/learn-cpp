@@ -1,3 +1,6 @@
 BasedOnStyle: Microsoft
 DerivePointerAlignment: false
 PointerAlignment: Left
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterControlStatement: false

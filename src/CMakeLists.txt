@@ -28,3 +28,11 @@ target_link_libraries(my_app
 )
 
 set_target_properties(my_app PROPERTIES CXX_STANDARD 20)
+
+# 自定义 run 目标 — 类似 cargo run
+add_custom_target(run
+    COMMAND my_app
+    DEPENDS my_app
+    USES_TERMINAL
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/src
+)

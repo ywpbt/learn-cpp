@@ -7,3 +7,6 @@
 [submodule "third_party/hical"]
 	path = third_party/hical
 	url = https://github.com/Hical61/Hical.git
+[submodule "third_party/doctest"]
+	path = third_party/doctest
+	url = https://github.com/doctest/doctest.git
