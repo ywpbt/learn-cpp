@@ -2,9 +2,9 @@
 
 ## Build System
 
-- **CMake 4.0+** with **Ninja** generator on **MSYS2 MINGW64** (g++ via `C:/msys64/ucrt64/bin/g++.exe`)
+- **CMake** with **Unix Makefiles** generator on **Linux** (GCC 14.2.0 via `/usr/bin/g++`)
 - C++ standard: **C++20**
-- Presets defined in `CMakeUserPresets.json`
+- Presets defined in `CMakePresets.json`
 
 ### Setup (first time)
 
@@ -12,28 +12,35 @@
 git submodule update --init --recursive
 ```
 
-External system deps must be installed via MSYS2 before building:
-- `Boost` (>= 1.78)
-- `spdlog`
+System dependencies must be installed before building:
+- `spdlog` (e.g., `sudo apt install libspdlog-dev` on Debian/Ubuntu)
 
 ### Build commands
 
 ```bash
-# Configure + build (Debug)
+# Configure
 cmake --preset default
-cmake --build --preset default
 
-# Configure + build (Release)
-cmake --preset release
-cmake --build --preset release
+# Build
+cmake --build --preset debug
 
 # Run the app
-./build/src/my_app.exe
+./build/src/my_app
 ```
 
 ### Tests
 
-Tests are not yet implemented. The `tests/CMakeLists.txt` is a placeholder.
+Tests use the **doctest** framework (submodule at `third_party/doctest/`).
+
+```bash
+# Build & run all tests
+cmake --build --preset debug
+cd build && ctest --output-on-failure
+```
+
+Available test targets:
+- `test_math_utils` — tests for `math_utils` (via `doctest::doctest_with_main`)
+- `test_read_lines` — read-line utilities (via `doctest::doctest_with_main`, includes `learn_unique_ptr.cpp`)
 
 ## Code Style
 
@@ -43,19 +50,41 @@ Tests are not yet implemented. The `tests/CMakeLists.txt` is a placeholder.
 
 ## Dependencies
 
-| Dependency | Type       |
-| ---------- | ---------- |
-| fmt        | submodule  |
-| cxxopts    | submodule  |
-| hical      | submodule  |
-| Boost      | system (MSYS2) |
-| spdlog     | system (MSYS2) |
+| Dependency     | Type         | CMake Target                |
+| -------------- | ------------ | --------------------------- |
+| fmt            | submodule    | `fmt::fmt`                  |
+| cxxopts        | submodule    | (not yet linked)            |
+| hical          | submodule    | (not yet linked)            |
+| cpp-httplib    | submodule    | `cpp_httplib` (INTERFACE)   |
+| doctest        | submodule    | `doctest::doctest_with_main` / `doctest::doctest` |
+| spdlog         | system       | `spdlog::spdlog`            |
 
 ## Architecture
 
-- **`src/main.cpp`** — single-file application entrypoint, currently a trivial "hello world"-style program using `spdlog` and `fmt`
-- **`third_party/`** — git submodules, their tests/examples are disabled in `third_party/CMakeLists.txt`
+```
+learn-cpp/
+├── src/
+│   ├── CMakeLists.txt       — builds my_app + math_utils library
+│   ├── main.cpp             — entrypoint, uses spdlog + fmt + math_utils
+│   ├── math_utils.h/.cpp    — utility library (e.g. add function)
+│   └── learn_unique_ptr.cpp — shared source compiled into test_read_lines
+├── tests/
+│   ├── CMakeLists.txt       — test targets using doctest
+│   ├── test_math_utils.cpp  — tests for math_utils
+│   └── test_read_lines.cpp  — tests for read-line logic
+├── third_party/
+│   ├── CMakeLists.txt       — aggregates all submodules, disables their tests
+│   ├── cpp-httplib/         — header-only HTTP library (INTERFACE target)
+│   ├── cxxopts/             — command-line option parser
+│   ├── doctest/             — header-only test framework
+│   ├── fmt/                 — formatting library
+│   └── hical/               — (not yet linked)
+├── CMakeLists.txt           — root build file
+└── CMakePresets.json        — GCC 14.2.0 debug preset
+```
+
 - Build output goes to `build/` (gitignored)
+- `compile_commands.json` is generated at `build/compile_commands.json`
 
 ## Plan Mode
 

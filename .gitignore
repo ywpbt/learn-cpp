@@ -1,3 +1,5 @@
 build/*
 .vscode1/*
 CMakeUserPresets.json1
+zzAGENTS copy.md
+compile_commands.json
