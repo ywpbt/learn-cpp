@@ -19,5 +19,8 @@ int main(int argc, char* argv[])
     spdlog::info("Getting IP address:");
     get_ip_address();
 
+    spdlog::info("Getting request headers:");
+    get_req_headers();
+
     return 0;
 }
