@@ -4,3 +4,11 @@ PointerAlignment: Left
 BreakBeforeBraces: Custom
 BraceWrapping:
   AfterControlStatement: false
+SortIncludes: true
+IncludeCategories:
+  - Regex:           '^<[a-z]+>'
+    Priority:        1
+  - Regex:           '^<[^>]+>'
+    Priority:        2
+  - Regex:           '^"'
+    Priority:        3

@@ -9,7 +9,19 @@ target_include_directories(math_utils
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+add_library(http_utils
+    http_utils.cpp
+)
 
+target_include_directories(http_utils
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+target_link_libraries(http_utils
+    PUBLIC
+        cpp_httplib
+)
 
 add_executable(my_app
     main.cpp
@@ -25,6 +37,7 @@ target_link_libraries(my_app
         fmt::fmt
         spdlog::spdlog
         math_utils
+        http_utils
 )
 
 set_target_properties(my_app PROPERTIES CXX_STANDARD 20)

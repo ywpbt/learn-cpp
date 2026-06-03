@@ -5,6 +5,8 @@ set(DOCTEST_WITH_MAIN_IN_STATIC_LIB ON CACHE BOOL "" FORCE)
 # 添加子模块
 add_subdirectory(doctest)
 
+find_package(OpenSSL REQUIRED)
+
 # 创建一个名叫 cpp_httplib 的 INTERFACE 库（无源文件）
 add_library(cpp_httplib INTERFACE)
 
@@ -14,8 +16,16 @@ target_include_directories(cpp_httplib
         ${CMAKE_CURRENT_SOURCE_DIR}/cpp-httplib
 )
 
-# 链接时需要 pthread
+# 启用 OpenSSL 支持
+target_compile_definitions(cpp_httplib
+    INTERFACE
+        CPPHTTPLIB_OPENSSL_SUPPORT
+)
+
+# 链接时需要 pthread + OpenSSL
 target_link_libraries(cpp_httplib
     INTERFACE
         pthread
+        OpenSSL::SSL
+        OpenSSL::Crypto
 )
