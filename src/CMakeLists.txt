@@ -19,8 +19,23 @@ target_include_directories(http_utils
 )
 
 target_link_libraries(http_utils
-    PUBLIC
+    PRIVATE
         cpp_httplib
+)
+
+add_library(deepseek_chat
+    deepseek_chat.cpp
+)
+
+target_include_directories(deepseek_chat
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+target_link_libraries(deepseek_chat
+    PRIVATE
+        cpp_httplib
+        nlohmann_json::nlohmann_json
 )
 
 add_executable(my_app
@@ -38,6 +53,7 @@ target_link_libraries(my_app
         spdlog::spdlog
         math_utils
         http_utils
+        deepseek_chat
 )
 
 set_target_properties(my_app PROPERTIES CXX_STANDARD 20)

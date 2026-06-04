@@ -1,5 +1,7 @@
 #include "http_utils.h"
+#include <iostream>
 #include <httplib.h>
+
 void get_ip_address()
 {
     // http://ip-api.com

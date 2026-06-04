@@ -29,3 +29,7 @@ target_link_libraries(cpp_httplib
         OpenSSL::SSL
         OpenSSL::Crypto
 )
+
+
+# nlohmann/json — 头文件库，使用 upstream CMake 配置
+add_subdirectory(nlohmann_json)

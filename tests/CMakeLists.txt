@@ -10,3 +10,14 @@ add_executable(test_read_lines
 target_link_libraries(test_read_lines PRIVATE doctest::doctest_with_main)
 
 add_test(NAME test_read_lines COMMAND test_read_lines)
+
+add_executable(test_deepseek_chat test_deepseek_chat.cpp)
+target_link_libraries(test_deepseek_chat
+    PRIVATE
+        deepseek_chat
+        cpp_httplib
+        nlohmann_json::nlohmann_json
+        doctest::doctest_with_main
+)
+
+add_test(NAME test_deepseek_chat COMMAND test_deepseek_chat)

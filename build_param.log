@@ -30,3 +30,5 @@ cmake --build --preset <name>  # 使用指定 preset 编译
 
 
 如果想使用 glob 可以在 CMake 3.12+ 使用 CONFIGURE_DEPENDS: file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "*.cc")
+
+cd build && ctest --output-on-failure -R test_deepseek_chat

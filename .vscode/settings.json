@@ -3,5 +3,10 @@
     "chat.utilitySmallModel": "customendpoint/deepseek-v4-flash",
     "chat.tools.terminal.autoApprove": {
         "ctest": true,
-    }
+    },
+    "chat.planAgent.defaultModel": "deepseek v4 flash (customendpoint)",
+    "github.copilot.chat.localeOverride": "zh-CN",
+    "github.copilot.enable": {
+        "cpp": false
+    },
 }
