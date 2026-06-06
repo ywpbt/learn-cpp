@@ -2,3 +2,4 @@ build/*
 .vscode1/*
 CMakeUserPresets.json1
 compile_commands.json
+api_key.log

@@ -9,4 +9,5 @@
     "github.copilot.enable": {
         "cpp": false
     },
+    "C_Cpp.autocompleteAddParentheses": true,
 }

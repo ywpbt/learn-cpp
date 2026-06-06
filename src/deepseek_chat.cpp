@@ -1,5 +1,8 @@
 #include "deepseek_chat.h"
+#include <cstdlib>
 #include <iostream>
+#include <sstream>
+#include <string>
 #include <httplib.h>
 #include <nlohmann/json.hpp>
 
@@ -7,15 +10,122 @@ using n_json = nlohmann::json;
 
 void live_chat()
 {
-    n_json j = R"({
-        "name": "cpp",
-        "age": 50,
-        "live": true
-    })";
+    const char* apikey = std::getenv("APIKEY");
+    if (!apikey) {
+        std::cerr << "错误：未设置环境变量 APIKEY" << "\n";
+        return;
+    }
+    std::string bearer = "Bearer " + std::string(apikey);
 
-    std::string s1 = j.dump();
+    const std::string url = "https://api.deepseek.com";
+    // httplib::Headers headers = {
+    //     {"content-type", "application/json"},
+    //     {"Authorization", bearer},
+    // };
+    httplib::Client cli(url);
+    cli.set_default_headers({
+        {"Authorization", bearer},
+    });
 
-    // std::cout << std::setw(4) << j << "\n";
-    std::cout << s1 << "\n";
-    // std::cout << j.dump(4) << "\n";
+    n_json payload = {
+        {"model", "deepseek-v4-flash"},
+        {"stream", true},
+        {"reasoning_effort", "max"},
+        {"messages", {{{"role", "system"}, {"content", "幽默风趣的智能小助手"}}}},
+    };
+    payload["messages"].push_back({{"role", "user"}, {"content", "Hello"}});
+    std::cout << payload.dump() << "\n\n";
+
+    bool has_shown_hint = true;
+
+    auto stream = httplib::stream::Post(cli, "/chat/completions", payload.dump(), "application/json");
+    if (stream && stream.status() == 200) {
+        std::string chunked;
+
+        while (stream.next()) {
+            if (stream.size() == 0) {
+                continue;
+            }
+
+            chunked.append(stream.data(), stream.size());
+
+            std::istringstream iss(chunked);
+            std::string line;
+
+            while (std::getline(iss, line)) {
+                if (line.empty()) {
+                    continue;
+                }
+
+                if (line.starts_with("data:")) {
+
+                    std::string json_str = line.substr(6);
+                    if (json_str == "[DONE]") {
+                        break;
+                    }
+
+                    n_json json = n_json::parse(json_str);
+                    try {
+
+                        auto reasoning = json["choices"][0]["delta"]["reasoning_content"];
+                        if (!reasoning.empty() && !reasoning.is_null()) {
+                            if (has_shown_hint) {
+                                std::cout << "[思考]: " << std::flush;
+                                has_shown_hint = false;
+                            }
+                            std::cout << reasoning.get<std::string>() << std::flush;
+                        }
+
+                        auto answer = json["choices"][0]["delta"]["content"];
+                        if (!answer.empty() && !answer.is_null()) {
+                            if (!has_shown_hint) {
+                                std::cout << "\n\n";
+                                std::cout << "[回复]: " << std::flush;
+                                has_shown_hint = true;
+                            }
+                            std::cout << answer.get<std::string>() << std::flush;
+                        }
+                    }
+                    catch (std::exception e) {
+                        std::cerr << "JSON解析错误:" << e.what() << "\n";
+                        return;
+                    }
+                }
+            }
+
+            chunked.clear();
+        }
+    }
+    else {
+        std::cerr << stream.status() << ":" << stream.error() << "\n";
+    }
+    std::cout << "\n";
+}
+
+void print_char(const char* str, size_t len)
+{
+    const char* data = str;
+    size_t len1 = len;
+    const char* start = data;
+    const char* end = start + len;
+
+    printf("%.*s", (int)len, data);
+    printf("======\n");
+
+    for (const char* p = data; p <= end; p++) {
+        switch (*p) {
+        case '\r':
+            printf("\\r\n");
+            break;
+        case '\n':
+            printf("\\n\n");
+            break;
+        case '\t':
+            printf("\\t\n");
+            break;
+        case '\0':
+            printf("\\0\n");
+            break;
+        }
+    }
 }
