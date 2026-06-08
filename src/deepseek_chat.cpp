@@ -82,10 +82,7 @@ void live_chat()
     }
 
     const std::string url = "https://api.deepseek.com";
-    // httplib::Headers headers = {
-    //     {"content-type", "application/json"},
-    //     {"Authorization", bearer},
-    // };
+
     httplib::Client cli(url);
     cli.set_default_headers({
         {"Authorization", bearer},
@@ -97,16 +94,10 @@ void live_chat()
         {"reasoning_effort", "max"},
         {"messages", {{{"role", "system"}, {"content", sys_prompt}}}},
     };
-    // payload["messages"].push_back(
-    //     {{"role", "user"},
-    //      {"content",
-    //      "我想要知道现在的时间点2026年6月为止gcc各版本对应的C++标准能让我在工作中能方便的选择适合项目的C++标准."}});
-    // std::cout << payload.dump() << "\n\n";
 
     while (true) {
         std::string inputs = read_mutiline_input();
         if (inputs.empty()) {
-            // print_char(inputs.c_str(), inputs.size());
             break;
         }
 
@@ -114,12 +105,7 @@ void live_chat()
             {"role", "user"},
             {"content", inputs},
         });
-        std::cout << payload.dump() << "\n\n";
-
-        // if (!inputs.empty()) {
-        //     std::cout << payload << "\n\n";
-        //     break;
-        // }
+        // std::cout << payload.dump() << "\n\n";
 
         std::string assistant_reply;
         bool has_shown_hint = true;
