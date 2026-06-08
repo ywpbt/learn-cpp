@@ -1,5 +1,7 @@
 #include "deepseek_chat.h"
 #include <cstdlib>
+#include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -40,6 +42,31 @@ std::string read_mutiline_input()
     return inputs;
 }
 
+std::string read_sys_prompt()
+{
+    namespace fs = std::filesystem;
+
+    fs::path path = "sys_prompt.md";
+    if (!fs::exists(path)) {
+        std::cout << path.c_str() << " not found!" << '\n';
+        return "";
+    }
+
+    auto abs_path = fs::absolute(path);
+
+    auto size = fs::file_size(abs_path);
+    std::string content(size, '\0');
+
+    std::ifstream ifs(abs_path);
+    ifs.read(content.data(), size);
+
+    if (content.back() == '\n') {
+        content.pop_back();
+    }
+
+    return content;
+}
+
 void live_chat()
 {
     const char* apikey = std::getenv("APIKEY");
@@ -48,6 +75,11 @@ void live_chat()
         return;
     }
     std::string bearer = "Bearer " + std::string(apikey);
+
+    std::string sys_prompt = read_sys_prompt();
+    if (sys_prompt.empty()) {
+        return;
+    }
 
     const std::string url = "https://api.deepseek.com";
     // httplib::Headers headers = {
@@ -63,7 +95,7 @@ void live_chat()
         {"model", "deepseek-v4-flash"},
         {"stream", true},
         {"reasoning_effort", "max"},
-        {"messages", {{{"role", "system"}, {"content", "You are a helpful assistant."}}}},
+        {"messages", {{{"role", "system"}, {"content", sys_prompt}}}},
     };
     // payload["messages"].push_back(
     //     {{"role", "user"},
@@ -127,12 +159,6 @@ void live_chat()
                         }
                         catch (const std::exception& e) {
                             std::cerr << "\nJSON解析错误:" << e.what() << '\n';
-                            std::cerr << "\n" << "json_str:" << json_str << "\n\n";
-                            std::cerr << "\n" << "line:" << line << "\n\n";
-                            std::cerr << "\n" << "chunked:" << chunked << "\n\n";
-                            std::cerr << "\n"
-                                      << "stream data:" << stream.data() << "\n"
-                                      << "stream size:" << stream.size() << "\n\n";
                             return;
                         }
 
@@ -173,6 +199,7 @@ void live_chat()
         }
         else {
             std::cerr << stream.status() << ":" << stream.error() << "\n";
+            continue;
         }
         payload["messages"].push_back({
             {"role", "assistant"},
