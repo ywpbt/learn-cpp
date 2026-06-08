@@ -3,3 +3,4 @@ build/*
 CMakeUserPresets.json1
 compile_commands.json
 api_key.log
+build_param.log
