@@ -5,8 +5,6 @@ set(DOCTEST_WITH_MAIN_IN_STATIC_LIB ON CACHE BOOL "" FORCE)
 # 添加子模块
 add_subdirectory(doctest)
 
-# 使用静态 OpenSSL（libssl.a / libcrypto.a），支持 -static 链接
-set(OPENSSL_USE_STATIC_LIBS ON)
 find_package(OpenSSL REQUIRED)
 
 # 创建一个名叫 cpp_httplib 的 INTERFACE 库（无源文件）

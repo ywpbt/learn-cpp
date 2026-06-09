@@ -57,16 +57,11 @@ target_include_directories(deepseek
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
-target_compile_definitions(deepseek
-    PRIVATE
-        SPDLOG_HEADER_ONLY
-)
 target_link_libraries(deepseek
     PRIVATE
-        fmt::fmt-header-only
+        spdlog::spdlog
         deepseek_chat
 )
-target_link_options(deepseek PRIVATE -static)
 set_target_properties(deepseek PROPERTIES CXX_STANDARD 20)
 
 
