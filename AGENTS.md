@@ -14,6 +14,8 @@ git submodule update --init --recursive
 
 System dependencies must be installed before building:
 - `spdlog` (e.g., `sudo apt install libspdlog-dev` on Debian/Ubuntu)
+- `fmt` (e.g., `sudo apt install libfmt-dev` on Debian/Ubuntu)
+- `OpenSSL` (e.g., `sudo apt install libssl-dev` on Debian/Ubuntu)
 
 ### Build commands
 
@@ -26,6 +28,12 @@ cmake --build --preset debug
 
 # Run the app
 ./build/src/my_app
+
+# Run the DeepSeek chat CLI
+./build/src/deepseek
+
+# Run via custom target (like cargo run)
+cmake --build --preset debug --target run
 ```
 
 ### Tests
@@ -41,6 +49,7 @@ cd build && ctest --output-on-failure
 Available test targets:
 - `test_math_utils` — tests for `math_utils` (via `doctest::doctest_with_main`)
 - `test_read_lines` — read-line utilities (via `doctest::doctest_with_main`, includes `learn_unique_ptr.cpp`)
+- `test_deepseek_chat` — tests for `deepseek_chat` (via `doctest::doctest_with_main`)
 
 ## Code Style
 
@@ -50,41 +59,49 @@ Available test targets:
 
 ## Dependencies
 
-| Dependency     | Type         | CMake Target                |
-| -------------- | ------------ | --------------------------- |
-| fmt            | submodule    | `fmt::fmt`                  |
-| cxxopts        | submodule    | (not yet linked)            |
-| hical          | submodule    | (not yet linked)            |
-| cpp-httplib    | submodule    | `cpp_httplib` (INTERFACE)   |
-| doctest        | submodule    | `doctest::doctest_with_main` / `doctest::doctest` |
-| spdlog         | system       | `spdlog::spdlog`            |
+| Dependency     | Type         | CMake Target                              |
+| -------------- | ------------ | ----------------------------------------- |
+| cpp-httplib    | submodule    | `cpp_httplib` (INTERFACE, OpenSSL enabled)|
+| doctest        | submodule    | `doctest::doctest_with_main` / `doctest`  |
+| nlohmann_json  | submodule    | `nlohmann_json::nlohmann_json`            |
+| spdlog         | system       | `spdlog::spdlog`                          |
+| fmt            | system       | `fmt::fmt` (provided via spdlog or system)|
+| OpenSSL        | system       | `OpenSSL::SSL`, `OpenSSL::Crypto`         |
 
 ## Architecture
 
 ```
 learn-cpp/
 ├── src/
-│   ├── CMakeLists.txt       — builds my_app + math_utils library
-│   ├── main.cpp             — entrypoint, uses spdlog + fmt + math_utils
-│   ├── math_utils.h/.cpp    — utility library (e.g. add function)
-│   └── learn_unique_ptr.cpp — shared source compiled into test_read_lines
+│   ├── CMakeLists.txt          — builds my_app + libraries
+│   ├── main.cpp                — entrypoint, uses spdlog + http_utils + math_utils
+│   ├── math_utils.h/.cpp       — utility library (e.g. add function)
+│   ├── http_utils.h/.cpp       — HTTP utility library (uses cpp-httplib)
+│   ├── deepseek_chat.h/.cpp    — DeepSeek chat API client (uses cpp-httplib + nlohmann_json)
+│   ├── deepseek.cpp            — standalone DeepSeek chat CLI entrypoint
+│   └── learn_unique_ptr.cpp    — shared source compiled into test_read_lines
 ├── tests/
-│   ├── CMakeLists.txt       — test targets using doctest
-│   ├── test_math_utils.cpp  — tests for math_utils
-│   └── test_read_lines.cpp  — tests for read-line logic
+│   ├── CMakeLists.txt          — test targets using doctest
+│   ├── test_math_utils.cpp     — tests for math_utils
+│   ├── test_read_lines.cpp     — tests for read-line logic
+│   └── test_deepseek_chat.cpp  — tests for deepseek_chat
 ├── third_party/
-│   ├── CMakeLists.txt       — aggregates all submodules, disables their tests
-│   ├── cpp-httplib/         — header-only HTTP library (INTERFACE target)
-│   ├── cxxopts/             — command-line option parser
-│   ├── doctest/             — header-only test framework
-│   ├── fmt/                 — formatting library
-│   └── hical/               — (not yet linked)
-├── CMakeLists.txt           — root build file
-└── CMakePresets.json        — GCC 14.2.0 debug preset
+│   ├── CMakeLists.txt          — aggregates all submodules, manages dependencies
+│   ├── cpp-httplib/            — header-only HTTP library (INTERFACE, with OpenSSL)
+│   ├── doctest/                — header-only test framework
+│   └── nlohmann_json/          — JSON library (header-only, upstream CMake)
+├── CMakeLists.txt              — root build file
+└── CMakePresets.json           — GCC 14.2.0 debug preset
 ```
 
 - Build output goes to `build/` (gitignored)
 - `compile_commands.json` is generated at `build/compile_commands.json`
+
+## Custom Targets
+
+| Target | Description |
+|--------|-------------|
+| `run`  | Builds & runs `my_app` (類似 `cargo run`) |
 
 ## Plan Mode
 
