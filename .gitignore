@@ -4,3 +4,4 @@ CMakeUserPresets.json1
 compile_commands.json
 api_key.log
 build_param.log
+doc/参考.md
